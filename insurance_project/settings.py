@@ -84,7 +84,7 @@ if 'DATABASE_URL' in os.environ:
         'default': dj_database_url.config(
             default=os.environ.get('DATABASE_URL'),
             conn_max_age=600,
-            conn_health_check=True,
+            
         )
     }
 else:
@@ -99,6 +99,7 @@ else:
             'PORT': '5432',
         }
     }
+    #Ali.5192c supabase
 
 
 # Password validation
