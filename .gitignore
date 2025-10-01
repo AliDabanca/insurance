@@ -1,0 +1,18 @@
+# Django ve Python İhmalleri
+*.log
+*.pyc
+__pycache__/
+
+# Sanal Ortamlar
+venv/
+env/
+
+# Ortam Dosyaları
+.env
+.local
+
+# Veritabanı
+*.sqlite3
+
+# Statik Dosyalar (Derleme Sonucu Oluşur)
+/staticfiles/

@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Müşteri Listesi{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-users me-2"></i> Müşteri Listesi</h2>
+        <a href="{% url 'add_customer' %}" class="btn btn-success d-flex align-items-center">
+            <i class="fas fa-plus me-2"></i> Yeni Müşteri Ekle
+        </a>
+    </div>
+
+    <!-- Filtreleme Formu -->
+    <form method="get" class="card card-body shadow-sm mb-4 transparent-card">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label for="search_name" class="form-label">
+                    <i class="fas fa-search me-1"></i> İsim, TC veya Plaka Ara
+                </label>
+                <input type="text" id="search_name" name="search_name" class="form-control"
+                    value="{{ search_name|default:'' }}" placeholder="İsim, TC, telefon veya plaka...">
+            </div>
+            <div class="col-md-3">
+                <label for="filter_policy" class="form-label">
+                    <i class="fas fa-list-alt me-1"></i> Poliçe Tipi
+                </label>
+                <select id="filter_policy" name="filter_policy" class="form-select">
+                    <option value="Tümü" {% if filter_policy_is_all %} selected{% endif %}>Tümü</option>
+                    {% for pt in policy_types %}
+                    <option value="{{ pt.name }}" {% if pt.is_selected %} selected{% endif %}>{{ pt.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="filter_company" class="form-label">
+                    <i class="fas fa-building me-1"></i> Sigorta Şirketi
+                </label>
+                <select id="filter_company" name="filter_company" class="form-select">
+                    <option value="Tümü" {% if filter_company_is_all %} selected{% endif %}>Tümü</option>
+                    {% for company in insurance_companies %}
+                    <option value="{{ company.name }}" {% if company.is_selected %} selected{% endif %}>
+                        {{ company.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center">
+                    <i class="fas fa-filter me-2"></i> Filtrele
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Müşteri Kartları - Accordion parent kaldırıldı -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+        {% if show_customers %}
+        {% for customer in customers %}
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 customer-card">
+                <div
+                    class="card-header bg-gradient-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0 fw-bold">{{ customer.name }}</h5>
+                    <button class="btn btn-sm btn-outline-light toggle-details-btn" data-bs-toggle="collapse"
+                        data-bs-target="#details-{{ customer.id }}" aria-expanded="false"
+                        aria-controls="details-{{ customer.id }}">
+                        <i class="fas fa-chevron-down transition-icon"></i>
+                    </button>
+                </div>
+
+                <div class="card-body bg-light">
+                    <div class="row g-2">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center py-1">
+                                <span class="fw-semibold text-muted">
+                                    <i class="fas fa-id-card me-2 text-primary"></i>TC:
+                                </span>
+                                <span class="badge bg-secondary">{{ customer.tc_id|default:"-" }}</span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center py-1">
+                                <span class="fw-semibold text-muted">
+                                    <i class="fas fa-phone me-2 text-success"></i>Telefon:
+                                </span>
+                                <span>{{ customer.phone_number|default:"-" }}</span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center py-1">
+                                <span class="fw-semibold text-muted">
+                                    <i class="fas fa-briefcase me-2 text-info"></i>Meslek:
+                                </span>
+                                <span>{{ customer.profession|default:"-" }}</span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center py-1">
+                                <span class="fw-semibold text-muted">
+                                    <i class="fas fa-birthday-cake me-2 text-warning"></i>Doğum:
+                                </span>
+                                <span>{{ customer.date_of_birth|date:"d.m.Y"|default:"-" }}</span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center py-1">
+                                <span class="fw-semibold text-muted">
+                                    <i class="fas fa-map-marker-alt me-2 text-danger"></i>Şehir:
+                                </span>
+                                <span>{{ customer.city|default:"-" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ÖNEMLİ: data-bs-parent kaldırıldı! -->
+                <div id="details-{{ customer.id }}" class="collapse">
+                    <div class="card-footer bg-white border-top">
+                        <h6 class="mb-3 text-primary fw-bold">
+                            <i class="fas fa-file-contract me-2"></i>Poliçeler
+                            <span class="badge bg-primary ms-1">{{ customer.policies.count }}</span>
+                        </h6>
+
+                        {% if customer.policies.all %}
+                        {% for policy in customer.policies.all %}
+                        <div class="policy-item p-3 mb-3 rounded-3 border-start border-4 border-primary bg-light">
+                            <div class="row g-2 small">
+                                <div class="col-6">
+                                    <strong class="text-muted">Tip:</strong><br>
+                                    <span class="badge bg-info">{{ policy.policy_type|default:"--" }}</span>
+                                </div>
+                                <div class="col-6">
+                                    <strong class="text-muted">Şirket:</strong><br>
+                                    <span class="badge bg-success">{{ policy.insurance_company|default:"--" }}</span>
+                                </div>
+                                <div class="col-6">
+                                    <strong class="text-muted">Plaka:</strong><br>
+                                    {{ policy.plate_number|default:"--" }}
+                                </div>
+                                <div class="col-6">
+                                    <strong class="text-muted">Ruhsat:</strong><br>
+                                    {{ policy.license_number|default:"--" }}
+                                </div>
+                                <div class="col-12">
+                                    <strong class="text-muted">Bitiş:</strong>
+                                    <span class="badge bg-warning text-dark ms-1">
+                                        {{ policy.end_date|date:"d.m.Y"|default:"--" }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="text-center py-3">
+                            <i class="fas fa-exclamation-circle fa-2x text-muted mb-2"></i>
+                            <p class="text-muted mb-0">Bu müşteriye ait poliçe bulunamadı.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <div class="alert alert-warning mt-5" role="alert">
+                <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+                <h5>Müşteri Bulunamadı</h5>
+                <p class="mb-0">Filtreleme kriterlerine uyan müşteri bulunamadı.</p>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="col-12 text-center">
+            <div class="alert alert-info mt-5 alert-transparent" role="alert">
+                <i class="fas fa-search fa-3x mb-3 text-info"></i>
+                <h4 class="alert-heading">Arama Yapmaya Hazır</h4>
+                <p class="mb-0">Müşterileri görüntülemek için yukarıdaki formu kullanarak arama yapın veya filtre
+                    uygulayın.</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/customer_list.js' %}"></script>
+{% endblock %}

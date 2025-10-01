@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sigorta Yönetimi{% endblock %}</title>
+    <meta name="description" content="Sigorta poliçe yönetim sistemi">
+
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+
+    <!-- Font Awesome İkonları CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="{% url 'customer_list' %}">
+                Sigorta Yönetimi
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'customer_list' %}active{% endif %}"
+                            href="{% url 'customer_list' %}">
+                            <i class="fas fa-users me-1"></i> Müşteriler
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'add_customer' %}active{% endif %}"
+                            href="{% url 'add_customer' %}">
+                            <i class="fas fa-user-plus me-1"></i> Yeni Müşteri
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'referanslar' %}active{% endif %}"
+                            href="{% url 'referanslar' %}">
+                            <i class="fas fa-list me-1"></i> Referanslar
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Ana İçerik -->
+    <main class="main-content">
+        <!-- Breadcrumb -->
+        {% block breadcrumb %}
+        {% if request.resolver_match.url_name != 'customer_list' %}
+        <nav aria-label="breadcrumb" class="mt-3">
+            <div class="container">
+                <ol class="breadcrumb">
+                    {% if request.resolver_match.url_name == 'add_customer' %}
+                    {% endif %}
+                </ol>
+            </div>
+        </nav>
+        {% endif %}
+        {% endblock %}
+
+        <!-- Sayfa İçeriği -->
+        <div class="container-fluid mt-4 fade-in">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
+
+    <!-- 🔽 Yaklaşan Poliçeler Kartı - Sadece Ana Sayfa 🔽 -->
+    {% if request.resolver_match.url_name == 'customer_list' and upcoming_policies %}
+    <div id="upcoming-policies-card" class="card shadow-sm">
+        <div class="card-header bg-primary text-white text-center">
+            Yaklaşan Poliçeler
+        </div>
+        <div class="card-body p-2">
+            <ul id="upcoming-policies-list" class="list-group list-group-flush">
+                {% for policy in upcoming_policies %}
+                {% if forloop.counter <= 5 %} <li
+                    class="list-group-item d-flex justify-content-between align-items-center">
+                    <span><strong>{{ policy.customer.name }}</strong> - {{ policy.policy_type.name }}</span>
+                    <span
+                        class="badge {% if policy.days_left <= 7 %} bg-danger {% elif policy.days_left <= 14 %} bg-warning {% else %} bg-success {% endif %}">
+                        {{ policy.days_left }} gün kaldı
+                    </span>
+                    </li>
+                    {% else %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center extra-policy"
+                        style="display:none;">
+                        <span><strong>{{ policy.customer.name }}</strong> - {{ policy.policy_type.name }}</span>
+                        <span
+                            class="badge {% if policy.days_left <= 7 %} bg-danger {% elif policy.days_left <= 14 %} bg-warning {% else %} bg-success {% endif %}">
+                            {{ policy.days_left }} gün kaldı
+                        </span>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+            </ul>
+            {% if upcoming_policies|length > 5 %}
+
+            {% endif %}
+        </div>
+    </div>
+
+
+    {% endif %}
+    <!-- 🔼 Yaklaşan Poliçeler Kartı -->
+
+    <!-- Footer -->
+    <footer class="mt-5 py-3">
+        <div class="container text-center text-muted">
+            <small>&copy; 2025 Sigorta Yönetimi Sistemi. Tüm hakları saklıdır.</small>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+        crossorigin="anonymous"></script>
+
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>
