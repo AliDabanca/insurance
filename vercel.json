@@ -14,5 +14,5 @@
     }
   ],
 
-  "installCommand": "pip install -r requirements.txt && python manage.py makemigrations && python manage.py migrate --no-input" 
+  "installCommand": "pip install -r requirements.txt" 
 }
