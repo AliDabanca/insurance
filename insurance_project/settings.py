@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 import os
-import dj_database_url # type: ignore
+import dj_database_url
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -78,27 +78,14 @@ WSGI_APPLICATION = 'insurance_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-if 'DATABASE_URL' in os.environ:
-    # Vercel'de çalışırken (Ortam Değişkeni ayarlanmışsa)
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=os.environ.get('DATABASE_URL'),
-            conn_max_age=600,
-            
-        )
-    }
-else:
+
     # Lokal geliştirme için (Vercel'e göndermeyeceğiniz bu kısım kalabilir)
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'insurance_db',
-            'USER': 'postgres',
-            'PASSWORD': 'ali1486352',
-            'HOST': 'localhost',
-            'PORT': '5432',
-        }
-    }
+DATABASES = {
+    "default": dj_database_url.config(  # <-- 2. dj_database_url'ü kullanarak DATABASE_URL'i okuyun
+        default=os.environ.get('DATABASE_URL'),
+        conn_max_age=600,
+    )
+}
     #Ali.5192c supabase
 
 
