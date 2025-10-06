@@ -69,12 +69,14 @@ def customer_list(request):
 
         customers = customers.distinct().order_by('name')
 
-    policy_types = PolicyType.objects.all().order_by('name')
-    insurance_companies = InsuranceCompany.objects.all().order_by('name')
+    # BURASI DOĞRU: Veritabanından tüm tipleri ve şirketleri çekiyoruz.
+    policy_types_qs = PolicyType.objects.all().order_by('name')
+    insurance_companies_qs = InsuranceCompany.objects.all().order_by('name')
 
-    for pt in policy_types:
+    # Seçim durumlarını QuerySet objelerine ekliyoruz
+    for pt in policy_types_qs:
         pt.is_selected = (pt.name == filter_policy)
-    for company in insurance_companies:
+    for company in insurance_companies_qs:
         company.is_selected = (company.name == filter_company)
 
     # --- YAKLAŞAN POLİÇELER ---
@@ -94,22 +96,28 @@ def customer_list(request):
             "days_left": days_left,
         })
 
+    # CONTEXT İÇİNE DOĞRU DEĞİŞKENLERİ EKLEME:
     context = {
         'customers': customers,
         'search_name': search_name,
-        'policy_types': policy_types,
-        'insurance_companies': insurance_companies,
+        # Çektiğimiz QuerySet'leri (listeleri) buraya doğru isimlerle gönderiyoruz:
+        'policy_types': policy_types_qs, 
+        'insurance_companies': insurance_companies_qs,
+        # Ayrıca filtreleme dropdown'ında "Tümü" seçeneğini seçili yapmak için gerekli değişkenler:
         'filter_policy_is_all': (filter_policy == 'Tümü'),
         'filter_company_is_all': (filter_company == 'Tümü'),
+        
         'show_customers': show_customers,
-        'upcoming_policies': upcoming_policies,  # artık tüm poliçeler
+        'upcoming_policies': upcoming_policies,
         'today': today,
     }
+    # Template adı 'customer_list.html' olması gerekiyor.
     return render(request, 'customer_list.html', context)
 
 
 # ----------------- CREATE CUSTOMER -----------------
 def create_customer(request):
+# ... (Diğer fonksiyonlar aynı kaldı)
     if request.method == 'POST':
         customer_form = CustomerForm(request.POST)
         policy_form = PolicyForm(request.POST)
