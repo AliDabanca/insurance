@@ -9,6 +9,7 @@ from .models import Customer, PolicyType, InsuranceCompany, Policy, Referans
 from .forms import CustomerForm, PolicyForm, ReferansForm
 from django.http import JsonResponse
 from datetime import date, timedelta
+import logging # Yeni import
 
 # PostgreSQL UNACCENT fonksiyonu
 class Unaccent(Func):
@@ -72,6 +73,19 @@ def customer_list(request):
     # BURASI DOĞRU: Veritabanından tüm tipleri ve şirketleri çekiyoruz.
     policy_types_qs = PolicyType.objects.all().order_by('name')
     insurance_companies_qs = InsuranceCompany.objects.all().order_by('name')
+
+    # HATA TESPİTİ İÇİN LOGLAMA BAŞLANGICI
+    # Bu çıktılar Vercel'in çalışma zamanı (Runtime) loglarında görünecektir.
+    print(f"*** DEBUG LOG: Policy Types count: {policy_types_qs.count()}")
+    if policy_types_qs.exists():
+        first_pt = policy_types_qs.first()
+        print(f"*** DEBUG LOG: First Policy Type Name: {first_pt.name} (ID: {first_pt.pk})")
+    
+    print(f"*** DEBUG LOG: Insurance Companies count: {insurance_companies_qs.count()}")
+    if insurance_companies_qs.exists():
+        first_comp = insurance_companies_qs.first()
+        print(f"*** DEBUG LOG: First Insurance Company Name: {first_comp.name} (ID: {first_comp.pk})")
+    # HATA TESPİTİ İÇİN LOGLAMA SONU
 
     # Seçim durumlarını QuerySet objelerine ekliyoruz
     for pt in policy_types_qs:
