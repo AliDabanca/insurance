@@ -7,7 +7,7 @@ For more information on this file, see
 https://docs.djangoproject.com/en/5.2/topics/settings/
 
 For the full list of settings and their values, see
-https://docs.djangoproject.com/en/5.2/ref/settings/
+https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 """
 
 import os
@@ -44,11 +44,12 @@ INSTALLED_APPS = [
     'rest_framework',
     'insurance_app',
     'widget_tweaks', 
-    
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # WhiteNoise'u, SecurityMiddleware'in hemen altına ekleyin.
+    'whitenoise.middleware.WhiteNoiseMiddleware', 
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -80,15 +81,13 @@ WSGI_APPLICATION = 'insurance_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-
-    # Lokal geliştirme için (Vercel'e göndermeyeceğiniz bu kısım kalabilir)
 DATABASES = {
-    "default": dj_database_url.config(  # <-- 2. dj_database_url'ü kullanarak DATABASE_URL'i okuyun
+    "default": dj_database_url.config( 
         default=os.environ.get('DATABASE_URL'),
         conn_max_age=600,
     )
 }
-    #Ali.5192c supabase
+#Ali.5192c supabase
 
 
 # Password validation
@@ -131,6 +130,11 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
+
+# Production için WhiteNoise ayarları
+# WhiteNoise, toplanan statik dosyaları (STATIC_ROOT içindeki) sunacaktır.
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage' 
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
