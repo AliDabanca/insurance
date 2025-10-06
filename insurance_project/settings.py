@@ -81,10 +81,13 @@ WSGI_APPLICATION = 'insurance_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# Supabase, SSL gerektirdiği için bu ayarı açıkça ekliyoruz.
 DATABASES = {
     "default": dj_database_url.config( 
         default=os.environ.get('DATABASE_URL'),
         conn_max_age=600,
+        # KRİTİK DEĞİŞİKLİK: Supabase bağlantısı için SSL gereksinimini ekle
+        ssl_require=True, 
     )
 }
 #Ali.5192c supabase
