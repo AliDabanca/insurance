@@ -70,11 +70,11 @@ def customer_list(request):
 
         customers = customers.distinct().order_by('name')
 
-    # BURASI DOĞRU: Veritabanından tüm tipleri ve şirketleri çekiyoruz.
+    # BURASI ÇEKİM NOKTASI
     policy_types_qs = PolicyType.objects.all().order_by('name')
     insurance_companies_qs = InsuranceCompany.objects.all().order_by('name')
 
-    # HATA TESPİTİ İÇİN LOGLAMA BAŞLANGICI
+    # HATA TESPİTİ İÇİN DEBUG LOGLARI BURADA BAŞLAR
     # Bu çıktılar Vercel'in çalışma zamanı (Runtime) loglarında görünecektir.
     print(f"*** DEBUG LOG: Policy Types count: {policy_types_qs.count()}")
     if policy_types_qs.exists():
@@ -85,7 +85,7 @@ def customer_list(request):
     if insurance_companies_qs.exists():
         first_comp = insurance_companies_qs.first()
         print(f"*** DEBUG LOG: First Insurance Company Name: {first_comp.name} (ID: {first_comp.pk})")
-    # HATA TESPİTİ İÇİN LOGLAMA SONU
+    # HATA TESPİTİ İÇİN DEBUG LOGLARI BURADA BİTER
 
     # Seçim durumlarını QuerySet objelerine ekliyoruz
     for pt in policy_types_qs:
