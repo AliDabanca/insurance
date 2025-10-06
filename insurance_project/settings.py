@@ -25,7 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-n16yr@f4x+(9)&2c2!ik6@um&q-vlajw+4lei2b=+y5914y$u*'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+# Bu, Vercel'de tanımlayacağımız DJANGO_DEBUG ortam değişkenini okuyacak.
+# Eğer ortam değişkeni True ise, DEBUG True olur. Aksi takdirde False olur (Production default).
+DEBUG = os.environ.get('DJANGO_DEBUG') == 'True'
 
 ALLOWED_HOSTS = ['.vercel.app', '127.0.0.1', 'localhost', 'ahmetdabanca.com']
 
